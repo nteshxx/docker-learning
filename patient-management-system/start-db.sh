@@ -1,9 +1,6 @@
 # Responsible for creating postgres database
 source .env.db
 
-# RUN VOLUME AND NETWORK SETUP
-source setup.sh
-
 # CHECK FOR EXISTING CONTAINER ALREADY RUNNING
 if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
     echo "A container with name $CONTAINER_NAME already exists."
@@ -11,7 +8,21 @@ if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
     exit 1
 fi
 
-# DOCKER RUN COMMAND
+# CREATE NETWORK
+if [ "$(docker network ls -q -f name=$NETWORK_NAME)" ]; then
+    echo "A network with the name $NETWORK_NAME already exists. Skipping network creation."
+else
+    docker network create $NETWORK_NAME
+fi
+
+# CREATE VOLUME
+if [ "$(docker volume ls -q -f name=$VOLUME_NAME)" ]; then
+    echo "A volume with the name $VOLUME_NAME already exists. Skipping volume creation."
+else
+    docker volume create $VOLUME_NAME
+fi
+
+# BUILD DOCKER CONTAINER
 docker run --rm -d --name $CONTAINER_NAME \
     -e POSTGRES_DB=$POSTGRES_DB \
     -e POSTGRES_USER=$POSTGRES_USER \
