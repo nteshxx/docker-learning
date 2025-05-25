@@ -1,0 +1,11 @@
+services:
+  notebooks: 
+    build:
+      target: production
+    networks:
+      - notes-app-net
+  notes:
+    build:
+      target: production
+    networks:
+      - notes-app-net
